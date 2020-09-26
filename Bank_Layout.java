@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.*;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -12,21 +13,27 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import Bank.CreateUser;
+import Bank.Member;
 
 public class Bank_Layout extends Frame implements ActionListener {
 
+	Frame f[] = new Frame[5];
+	Canvas c[] = new Canvas[5];
 	Panel p[] = new Panel[10];
 	JLabel[] la = new JLabel[50];
 	JTextField[] tf = new JTextField[5];
-	
+	public Dialog dialog1, dialog2;
+	static int UserNum;
 	
 	Button[] b = new Button[10];
 	public Dialog dialog;
 	public Image img;
 
 	public Bank_Layout() {
+		dialog1 = new Dialog(this);
+		dialog2 = new Dialog(this);
 
-		img = Toolkit.getDefaultToolkit().getImage("C:/data/pigBank.jpg");
+		img = Toolkit.getDefaultToolkit().getImage("C:/data/pig3.jpg");
 		// 컴포넌트 초기화
 		la[0] = new JLabel("아이디 : ");
 		la[1] = new JLabel("비밀번호 : ");
@@ -34,8 +41,8 @@ public class Bank_Layout extends Frame implements ActionListener {
 		la[3] = new JLabel(" ");
 		la[4] = new JLabel(" ");
 		la[5] = new JLabel(" ");
-		la[6] = new JLabel("Bank Menu");
-		la[6].setFont(new Font("Serif", Font.BOLD, 50));
+		la[6] = new JLabel("Pig Bank");
+		la[6].setFont(new Font("Serif", Font.BOLD, 35));
 		la[7] = new JLabel(" ");
 		la[8] = new JLabel(" ");
 		la[9] = new JLabel(" ");
@@ -65,12 +72,12 @@ public class Bank_Layout extends Frame implements ActionListener {
 
 		// 패널 1 - BankMenu로고
 		p[0] = new Panel();
-		p[0].setLayout(new BorderLayout());
-		p[0].add(la[2], "North");
-		p[0].add(la[3], "East");
-		p[0].add(la[6], "Center");
-		p[0].add(la[4], "West");
-		p[0].add(la[5], "South");
+		p[0].setLayout(new GridLayout(1, 3));
+		p[0].add(la[2]);
+		// p[0].add(la[3], "East");
+		p[0].add(la[6]);
+		// p[0].add(la[4], "West");
+		p[0].add(la[5]);
 
 		p[6].add(p[0], "North");
 
@@ -120,29 +127,33 @@ public class Bank_Layout extends Frame implements ActionListener {
 		setSize(470, 550);
 		setVisible(true);
 		setTitle("Bank");
-		b[3].addActionListener(new ActionListener() {
 
+		// 회원가입
+		b[3].addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				new CreateUser();
+				setVisible(false);
 			}
-
 		});
 
 		// 닫기
-		addWindowListener(new WindowAdapter() { // 모바일에서 많이 사용(내부 익명)
+		addWindowListener(new WindowAdapter() { // 1모바일에서 많이 사용(내부 익명)
+
 			public void windowClosing(WindowEvent e) {
 				System.exit(0);
 			}
 		});
 
+		// 로그인
+
 		b[0].addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				login();
+
 			}
 		});
-
 	}
 
 	class ImagePanel extends Panel {
@@ -158,31 +169,42 @@ public class Bank_Layout extends Frame implements ActionListener {
 		Button b = (Button) obj;
 		System.out.println("회원가입 : " + b.getLabel());
 
+		dialog.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				dialog.setVisible(false); // dialog숨기기
+				dialog.dispose(); // 객체 해지
+			}
+		});
+
 	}
 
+	
 	public boolean login() {
 		String id = tf[0].getText();
 		String pw = tf[1].getText();
+		
 
 		boolean result = false;
+		
 		for (int i = 0; i < CreateUser.list.size(); i++) {
 
 			if (CreateUser.list.get(i) == null)
 				break;
 
 			if (id.equals(CreateUser.list.get(i).getId()) && pw.equals(CreateUser.list.get(i).getPw())) {
-				System.out.println(CreateUser.list.get(i).getName() + "님 반갑습니다.");
+				UserNum = i;
 				new MainLayout();
-
-				//CreateUser.list.get(i);
-				// member = members[i];
 				return true;
+
 			} else {
-				System.out.println("ID와 PW가 일치하지 않습니다.");
+				dialog1.setSize(300, 150);
+				dialog1.setVisible(true);
+				dialog1.add(new Label("아이디와 비밀번호가 일치하지 않습니다."));
+				// System.out.println("ID와 PW가 일치하지 않습니다.");
 				return false;
 			}
 		}
-		return result;
+		return true;
 	}
 
 	public static void main(String[] args) {
