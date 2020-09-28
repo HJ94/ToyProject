@@ -9,9 +9,9 @@ import java.awt.*;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
 import Bank.CreateUser;
 import Bank.Member;
 
@@ -21,13 +21,13 @@ public class Bank_Layout extends Frame implements ActionListener {
 	Canvas c[] = new Canvas[5];
 	Panel p[] = new Panel[10];
 	JLabel[] la = new JLabel[50];
-	JTextField[] tf = new JTextField[5];
-	public Dialog dialog1, dialog2;
+	static JTextField[] tf = new JTextField[5];
+	Dialog dialog1, dialog2;
 	static int UserNum;
-	
+
 	Button[] b = new Button[10];
-	public Dialog dialog;
-	public Image img;
+	Dialog dialog;
+	Image img;
 
 	public Bank_Layout() {
 		dialog1 = new Dialog(this);
@@ -151,6 +151,7 @@ public class Bank_Layout extends Frame implements ActionListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				login();
+				setVisible(false);
 
 			}
 		});
@@ -175,36 +176,30 @@ public class Bank_Layout extends Frame implements ActionListener {
 				dialog.dispose(); // 객체 해지
 			}
 		});
-
 	}
-
-	
 	public boolean login() {
 		String id = tf[0].getText();
 		String pw = tf[1].getText();
-		
 
-		boolean result = false;
-		
+			boolean result = false;
 		for (int i = 0; i < CreateUser.list.size(); i++) {
-
+			Object obj = CreateUser.list.get(i);
+			Member member = (Member) obj;
+			
 			if (CreateUser.list.get(i) == null)
 				break;
-
-			if (id.equals(CreateUser.list.get(i).getId()) && pw.equals(CreateUser.list.get(i).getPw())) {
+			
+			if (member.id.equals(id) && member.id.equals(pw)) {
 				UserNum = i;
 				new MainLayout();
-				return true;
-
-			} else {
-				dialog1.setSize(300, 150);
-				dialog1.setVisible(true);
-				dialog1.add(new Label("아이디와 비밀번호가 일치하지 않습니다."));
-				// System.out.println("ID와 PW가 일치하지 않습니다.");
+				break;
+				// return true;
+			} else if(member.id.equals(id) != member.pw.equals(pw)) {
+				JOptionPane.showMessageDialog(null, "정보가 일치하지 않습니다.");
 				return false;
 			}
 		}
-		return true;
+		return false;
 	}
 
 	public static void main(String[] args) {
