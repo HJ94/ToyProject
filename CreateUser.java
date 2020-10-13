@@ -1,36 +1,40 @@
 package Bank;
 
+import java.awt.Dialog;
+import java.awt.GridLayout;
+import java.awt.Label;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.beans.EventHandler;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Vector;
 import java.util.regex.Pattern;
-import java.awt.*;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-
-import api.Bank_Layout;
-import javax.swing.*;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 public class CreateUser extends JFrame implements ActionListener {
 
 	JPanel[] jp = new JPanel[10];
 	JLabel[] jl = new JLabel[100];
 	JButton[] jb = new JButton[10];
-	JTextField[] jf = new JTextField[5];
+	static JTextField[] jf = new JTextField[5];
 	JTextArea[] ja = new JTextArea[5];
 	public Dialog dialog;
-	
+
 	static List<Member> list = new Vector<>();
 
 	public CreateUser() {
 
-		
-		
 		// 회원가입 라벨
 		jp[0] = new JPanel();
 		jp[0].setLayout(new GridLayout(1, 5));
@@ -66,7 +70,7 @@ public class CreateUser extends JFrame implements ActionListener {
 
 		jl[5] = new JLabel(" ");
 		jl[6] = new JLabel("ID : ");
-		jf[0] = new JTextField("", 30);
+		jf[0] = new JTextField();
 		jl[7] = new JLabel(" ");
 		jl[8] = new JLabel(" ");
 
@@ -78,7 +82,7 @@ public class CreateUser extends JFrame implements ActionListener {
 
 		jl[9] = new JLabel(" ");
 		jl[10] = new JLabel("PW :  ");
-		jf[1] = new JTextField("", 30);
+		jf[1] = new JTextField();
 		jl[11] = new JLabel(" ");
 		jl[12] = new JLabel(" ");
 
@@ -149,90 +153,68 @@ public class CreateUser extends JFrame implements ActionListener {
 		jf[0].addActionListener(this);
 		jf[1].addActionListener(this);
 		jb[0].addActionListener(this);
-		
-		//회원가입 성공 다이얼로그
-		dialog = new Dialog(this);
-		dialog.setSize(200,200);
-		dialog.add(new Label("회원가입 되었습니다."));
-		
-		jb[0].addActionListener(new ActionListener(){
 
+		// 회원가입 성공 다이얼로그
+		dialog = new Dialog(this);
+		dialog.setSize(200, 200);
+		dialog.add(new Label("회원가입 되었습니다."));
+
+		// 확인버튼 이벤트-회원 가입 성공 다이얼로그
+		jb[0].addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				dialog.setVisible(true);
-				
-				
+				//dialog.setVisible(true);
+				JOptionPane.showMessageDialog(null, "회원가입 되었습니다.");
+				new Bank_Layout();
+				setVisible(false);
 			}
 			
+			
 		});
-
-
-		// 취소 버튼
+		// 취소 버튼 - 창 닫기
 		jb[1].addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.exit(0);
 			}
 		});
-
 		setSize(500, 350);
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-	
 	}
-	
-
-
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-		
+
 		String id = jf[0].getText();
 		String pw = jf[1].getText();
 		String name = jf[2].getText();
 		String phone = jf[3].getText();
 		String email = jf[4].getText();
-	
-//		//<로그인> 
-//		if(!id.equals("hj")) {
-//			System.out.println("입력하신 id가 유효하지 않습니다.");
-//			jf[0].requestFocus();
-//		}
-//		else if(!pw.equals("1028")) {
-//			System.out.println("입력하신 pw가 유효하지 않습니다.");
-//			jf[1].requestFocus();
-//		}
-//		else {
-//			System.out.println(id + "님 반갑습니다.");
-//		}
 
+		
 		Object obj = e.getSource();
 		if (obj.equals(jb[0])) {
 			createUser();
-			
 		}
-		new Bank_Layout();
-		
-
-		
 		dialog.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
-				dialog.setVisible(false); //dialog숨기기
-				dialog.dispose(); //객체 해지 
+				dialog.setVisible(false); // dialog숨기기
+				dialog.dispose(); // 객체 해지
 			}
-		});	
+		});
 	}
 
+	
 	// 회원가입
-	public void createUser() {
+	public static void createUser() {
 		String id = jf[0].getText();
 		String pw = jf[1].getText();
 		String name = jf[2].getText();
 		String phone = jf[3].getText();
 		String regExp = "^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$";
 		boolean result = Pattern.matches(regExp, phone);
-		;
+		
 		while (result == false) {
 			if (result == true) {
 				result = true;
@@ -267,23 +249,51 @@ public class CreateUser extends JFrame implements ActionListener {
 		System.out.println("회원가입 되었습니다!");
 		System.out.println("------------------");
 
+		
 		list.add(new Member(name, id, pw, email, phone, balance));
-		for (int i = 0; i < list.size(); i++) {
-			Object obj = list.get(i);
-			Member member = (Member) obj;
-			System.out.println(member.id);
-			System.out.println(member.pw);
-			System.out.println(member.name);
-			System.out.println(member.email);
-			System.out.println(member.phone);
-			System.out.println(member.balance);
-			System.out.println();
+		
+		String driver ="com.mysql.cj.jdbc.Driver"; //드라이버
+		String url = "jdbc:mysql://localhost:3306/app?characterEnconding=UTF-8&serverTimezone=UTC"; //url 정보
+		Connection conn = null;
+		Statement stmt = null;
+		
+		try {
+			Class.forName(driver);
+			conn = DriverManager.getConnection(url, "root", "java");
+			System.out.println("데이터베이스 연결 성공");
+			stmt = conn.createStatement();
+			String sql = insert();
+			int result2 = stmt.executeUpdate(sql);
+			String msg =result2 > -1 ? "데이터 저장 성공!" : "데이터 저장 실패!";
+			System.out.println(msg);
+		}catch(Exception e) {
+			System.out.println("데이터베이스 연결 실패!");
+		}finally {
+			try {
+				if(stmt != null)stmt.close();
+				if(conn != null)stmt.close();
+			}catch(Exception e) {}
 		}
 	}
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+
+	public static String insert() {
+		String id = jf[0].getText();
+		String pw = jf[1].getText();
+		String name = jf[2].getText();
+		String phone = jf[3].getText();
+		String email = jf[4].getText();
+		int balance = 0;
+		String account =  "0000" + "-" + (int)((Math.random()*9999)+1);
+		String sql = "insert into member values('" + name +"', '" + id + "','" + pw + "','" + email +"' , '" + phone +"','" + balance +"','" + account +"')";
+		return sql;
 	}
 	
+	public static void main(String[] args) throws Exception{
+		// TODO Auto-generated method stub	
+		new CreateUser();
+	}
+
+
 	
 
 }
