@@ -23,6 +23,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 
 public class MainLayout extends Frame implements ActionListener {
 	// List<Member> list = new Vector<>();
@@ -32,8 +33,8 @@ public class MainLayout extends Frame implements ActionListener {
 	TextField[] tf = new TextField[10];
 	Dialog dialog1, dialog2;
 	Image img;
-	String UserName;
-	int UserBalance, deposit, withdraw;
+	String UserName, UserAccount , Account, UserId;
+	int UserBalance=0, MyBalance, deposit, withdraw, Balance;
 	String driver = "com.mysql.cj.jdbc.Driver";
 	String url = "jdbc:mysql://localhost:3306/app?characterEnconding=UTF-8&serverTimezone=UTC"; // url 정보
 	Connection conn = null;
@@ -53,6 +54,7 @@ public class MainLayout extends Frame implements ActionListener {
 			while(rs.next()) {
 				if(id.equals(rs.getString("ID")) && pw.equals(rs.getString("PW"))) {
 					UserName = rs.getString("NAME");
+					UserAccount = rs.getString("ACCOUNT");
 					//UserBalance = rs.getInt("BALANCE");
 				}
 			}
@@ -81,7 +83,7 @@ public class MainLayout extends Frame implements ActionListener {
 		l[1].setFont(new Font("Serif", Font.BOLD, 40));
 		l[2] = new Label("");
 		l[3] = new Label("");
-		l[4] = new Label(UserName + "님 반갑습니다.");
+		l[4] = new Label(UserName + "님 의 계좌");
 		l[4].setFont(new Font("Serif", Font.BOLD, 20));
 		l[5] = new Label("");
 
@@ -102,7 +104,7 @@ public class MainLayout extends Frame implements ActionListener {
 //		b[2] = new Button("로그아웃");
 //		b[6] = new Button("회원 탈퇴");
 		l[50] = new Label("");
-		l[51] = new Label(UserName + "님의 잔액");
+		l[51] = new Label(UserAccount);
 		l[51].setFont(new Font("홍익인간", Font.BOLD, 20));
 		l[52] = new Label("");
 		l[53] = new Label("");
@@ -195,20 +197,51 @@ public class MainLayout extends Frame implements ActionListener {
 					public void actionPerformed(ActionEvent e) {
 						String id = Bank_Layout.tf[0].getText();
 						String pw = Bank_Layout.tf[0].getText();
-
+						String Account = tf[9].getText();
 						try {
 							Class.forName(driver);
 							conn = DriverManager.getConnection(url, "root", "java");
 							stmt = conn.createStatement();
 							String sql = "select * from member";
 							rs = stmt.executeQuery(sql);
+							//MyBalance - 로그인 화면에서 입력한 ID와 PW가 일치하는 사용자의 잔고를 가져옴
 							while(rs.next()) {
 								if(id.equals(rs.getString("ID")) && pw.equals(rs.getString("PW"))) {
-									UserBalance = rs.getInt("BALANCE");
+									MyBalance = rs.getInt("BALANCE");
+									//UserAccount = rs.getString("ACCOUNT");
+								}								
+							}
+							System.out.println("로그인한 사용자 잔고 : " + MyBalance);
+							
+							//UserAccount - 내가 입력한 다른 사용자 계좌
+							//UserBalance - 내가 이체하려고하는 사용자의 계좌 잔액
+							rs = stmt.executeQuery(sql);
+							while(rs.next()) {
+								if(Account.equals(rs.getString("ACCOUNT"))) {
+									Balance = rs.getInt("BALANCE");
+									UserId = rs.getString("ID");
+									//UserAccount = rs.getString("ACCOUNT");
+									System.out.println(rs.getInt("BALANCE"));
+ 									
+								} else {
+									JOptionPane.showMessageDialog(null, "존재하지 않는 계좌입니다.");
 								}
 							}
-							UserBalance += Integer.parseInt(tf[5].getText());
-							String sql2 = "update member set BALANCE = '" + UserBalance + "'WHERE ID = '" + UserName + "'" ;
+							System.out.println("내가 입력한 다른 사용자 계좌 : "+Account); 
+							System.out.println("내가 입력한 다른 사용자 계좌 잔액 : " + Balance);
+							System.out.println("내가 입력한 다른 사용자 계좌 잔액 : " + UserId);
+							
+							//내 잔고가 입력한 금액보다 크면 송금하고 내 잔고를 입력한 금액만큼 차감시킴 
+							if(MyBalance >= Integer.parseInt(tf[5].getText())) {
+								Balance += Integer.parseInt(tf[5].getText());
+								MyBalance -= Integer.parseInt(tf[5].getText());
+								JOptionPane.showMessageDialog(null, "입금되었습니다.");
+							}else {
+								JOptionPane.showMessageDialog(null, "잔액이 부족합니다.");
+							}
+							
+							MyBalance -= Integer.parseInt(tf[5].getText());
+							String sql2 = "update member set BALANCE = '" + Balance + "'WHERE ACCOUNT = '" + Account + "'" ;
 							int result = stmt.executeUpdate(sql2);
 							String msg = result > -1 ? "successful" : "fail";
 							System.out.println(msg);
@@ -221,7 +254,8 @@ public class MainLayout extends Frame implements ActionListener {
 								if(conn != null)conn.close();
 							}catch(Exception ex) {}
 						}
-							}
+					}
+					
 						});
 			}	
 		});
@@ -260,7 +294,8 @@ public class MainLayout extends Frame implements ActionListener {
 								if(conn != null)conn.close();
 							}catch(Exception ex) {}
 						}
-							}
+						JOptionPane.showMessageDialog(null, "출금되었습니다.");
+					}
 						});
 				
 			}
@@ -298,6 +333,7 @@ public class MainLayout extends Frame implements ActionListener {
 		b[14].addActionListener(this);
 		b[14].addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				JOptionPane.showMessageDialog(null, "로그아웃 되었습니다.");
 				new Bank_Layout();
 				setVisible(false);
 			}
@@ -338,6 +374,7 @@ public class MainLayout extends Frame implements ActionListener {
 				System.exit(0);
 			}
 		});
+		
 		//<회원 정보 삭제>
 		b[15].addActionListener(this);
 		b[15].addActionListener(new ActionListener() {
@@ -370,7 +407,7 @@ public class MainLayout extends Frame implements ActionListener {
 						} catch (Exception ex) {
 						}
 					}
-					
+					JOptionPane.showMessageDialog(null, "삭제되었습니다.");
 					}
 				});			
 			}
@@ -382,7 +419,7 @@ public class MainLayout extends Frame implements ActionListener {
 	public void Deposit() {
 		Frame fr2 = new Frame();
 		p[6] = new Panel();
-		p[6].setLayout(new GridLayout(3, 3));
+		p[6].setLayout(new GridLayout(4, 3));
 
 		l[59] = new Label("");
 		l[60] = new Label("입금하기");
@@ -392,6 +429,10 @@ public class MainLayout extends Frame implements ActionListener {
 		tf[5] = new TextField();
 		b[16] = new JButton("입금");
 
+		l[97] = new Label("계좌번호 입력");
+		tf[9] = new TextField();
+		l[98] = new Label("");
+		
 		l[65] = new Label("");
 		l[66] = new Label("");
 		l[67] = new Label("");
@@ -403,6 +444,10 @@ public class MainLayout extends Frame implements ActionListener {
 		p[6].add(l[62]);
 		p[6].add(tf[5]);
 		p[6].add(b[16]);
+		
+		p[6].add(l[97]);
+		p[6].add(tf[9]);
+		p[6].add(l[98]);
 
 		p[6].add(l[65]);
 		p[6].add(l[66]);
