@@ -28,8 +28,8 @@ import DB.DBAction;
 
 public class MainLayout extends Frame implements ActionListener {
 	// List<Member> list = new Vector<>();
-	
-	Frame fr = new Frame();
+	Frame fr5 = new Frame();
+	Frame fr2 = new Frame();
 	Panel[] p = new Panel[30];
 	Label[] l = new Label[200];
 	JButton[] b = new JButton[50];
@@ -240,6 +240,12 @@ public class MainLayout extends Frame implements ActionListener {
 				
 			}
 		});
+		// 닫기
+		fr5.addWindowListener(new WindowAdapter() { // 모바일에서 많이 사용(내부 익명)
+			public void windowClosing(WindowEvent e) {
+				System.exit(0);
+			}
+		});
 		
 		// <입금>
 		b[10].addActionListener(this);
@@ -261,7 +267,7 @@ public class MainLayout extends Frame implements ActionListener {
 							while(rs.next()) {
 								if(id.equals(rs.getString("ID")) && pw.equals(rs.getString("PW"))) {
 									MyBalance = rs.getInt("BALANCE");
-									//UserAccount = rs.getString("ACCOUNT");
+									UserAccount = rs.getString("ACCOUNT");
 								}								
 							}
 							System.out.println("로그인한 사용자 잔고 : " + MyBalance);
@@ -274,7 +280,6 @@ public class MainLayout extends Frame implements ActionListener {
 									Balance = rs.getInt("BALANCE");
 									UserId = rs.getString("ID");
 									Account = rs.getString("ACCOUNT");
-									System.out.println(rs.getInt("BALANCE"));
  									break;
 								}
 							}
@@ -287,13 +292,15 @@ public class MainLayout extends Frame implements ActionListener {
 								Balance += Integer.parseInt(tf[5].getText());
 								MyBalance -= Integer.parseInt(tf[5].getText());
 								JOptionPane.showMessageDialog(null, "입금되었습니다.");
+								fr2.setVisible(false);
 							}else {
 								JOptionPane.showMessageDialog(null, "잔액이 부족합니다.");
 							}
 							
-							MyBalance -= Integer.parseInt(tf[5].getText());
 							String sql2 = "update member set BALANCE = '" + Balance + "'WHERE ACCOUNT = '" + Account + "'" ;
 							int result = stmt.executeUpdate(sql2);
+							String sql3 = "update member set BALANCE = '" + MyBalance + "'WHERE ACCOUNT = '" + UserAccount + "'" ;
+							int result2 = stmt.executeUpdate(sql3);
 							String msg = result > -1 ? "successful" : "fail";
 							System.out.println(msg);
 							}catch(Exception ex) {
@@ -309,6 +316,12 @@ public class MainLayout extends Frame implements ActionListener {
 					
 						});
 			}	
+		});
+		// 닫기
+		fr2.addWindowListener(new WindowAdapter() { // 모바일에서 많이 사용(내부 익명)
+			public void windowClosing(WindowEvent e) {
+				System.exit(0);
+			}
 		});
 //		// <출금>
 		b[11].addActionListener(this);
@@ -496,6 +509,14 @@ public class MainLayout extends Frame implements ActionListener {
 				System.exit(0);
 			}
 		});
+//		b[21].addActionListener(this);
+//		b[21].addActionListener(new ActionListener() { 
+//			public void actionPerformed(ActionEvent arg0) { 
+//				System.exit(0); 
+//				} 
+//			});
+
+		
 		
 		//<회원 정보 삭제>
 		b[15].addActionListener(this);
@@ -532,7 +553,6 @@ public class MainLayout extends Frame implements ActionListener {
 					JOptionPane.showMessageDialog(null, "삭제되었습니다.");
 					}
 				});			
-				fr.setVisible(false);
 			}
 			
 		});	
@@ -659,7 +679,7 @@ public class MainLayout extends Frame implements ActionListener {
 		
 		l[92] = new Label("");
 		b[9] = new JButton("확인");
-		b[10] = new JButton("취소");
+		b[21] = new JButton("취소");
 		l[93] = new Label("");
 		
 		p[9].add(l[78]);
@@ -685,7 +705,7 @@ public class MainLayout extends Frame implements ActionListener {
 		
 		p[9].add(l[92]);
 		p[9].add(b[9]);
-		p[9].add(b[10]);
+		p[9].add(b[21]);
 		p[9].add(l[93]);
 		
 		l[94] = new Label("");
