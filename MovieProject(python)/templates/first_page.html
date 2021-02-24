@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+
+
+  <!-- Webpage Title -->
+  <title>MOVIEFLIX</title>
+
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <!--구글 폰트 -->
+  <link href="https://fonts.googleapis.com/css?family=Nanum+Myeongjo&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Do+Hyeon|Gaegu|Yeon+Sung&display=swap" rel="stylesheet">
+
+  <!-- <link rel="stylesheet" href="{{ url_for('static', filename='mystyle.css') }}"> -->
+
+
+
+  <!-- JS -->		
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+  <style>
+    .entire{
+     background-color: #000000;
+     width : 100%;
+     height: auto;
+
+   }
+
+   .wrap{
+    width:900px;
+    height:auto;
+    margin: auto;
+    text-align: center;
+  }
+  .title1{
+    font-size: 45pt;
+    text-align: center;
+    font-family: 'Nanum Myeongjo', serif;
+    color:#ffffff;
+  }
+
+  .input-group{
+    width:400px;
+    margin: 50px auto;
+  }
+
+  .btn{
+    background-color: #000000;
+    color:#ffffff;
+  }
+  .wrap2{
+    background-color: #000000;
+    width:900px;
+    margin: 50px auto;
+    text-align: center;
+  }
+  .jumbotron{
+    background-color: #000000;
+  }
+  .wrap3{
+    width: 900px;
+    height: auto;
+    margin : 0px auto;
+    text-align:center;
+  }
+  .row {
+    margin : auto ;
+    display : flex;
+    flex-direction: row;
+    justify-content:center; 
+  }
+
+
+</style>
+
+<script>
+
+  function openclose(){
+    if($('#movie-box').css('display') == 'none'){
+      $('#movie-box').show();
+      slide();
+      $('#btn-postingbox').text('닫기');
+
+    }else{
+      $('#movie-box').hide();
+      $('#btn-postingbox').text("개봉 예정영화 보기");
+    }
+
+  }
+
+
+  function search(){
+
+   let mykeyword = $('#input-keyword').val();
+
+   if (mykeyword == ''){
+    alert('키워드를 입력하세요!')
+    return;
+  } 
+
+  $.ajax({
+    type: "POST",
+    url: "/api/search",
+    data: {keyword_give:mykeyword},
+    success: function(response){
+      console.log(response)
+
+      if(response['result'] == 'success'){
+        listing();
+        alert('검색중입니다.')
+      }else{
+        alert('일치하는 영화가 없습니다.')
+        return;
+      }
+    }
+  })
+}
+
+function listing(){
+  let mykeyword = $('#input-keyword').val();
+
+  $.ajax({
+    type: "GET",
+    url: "/api/show",
+    data: {},
+    success: function(response){
+
+      let movies = response['movies']
+      $.unique(movies);
+
+      $('#article-box').html('')
+
+
+      for (let i = 0; i < movies.length; i++) {
+          if(movies[i]['title'].indexOf(mykeyword)!= -1){  
+            let title = movies[i]['title']
+            let link = movies[i]['link']
+            let image = movies[i]['image']
+            let director = movies[i]['director']
+            let actor = movies[i]['actor']
+
+
+            let temp_html = '<div class="card">\
+            <img class="card-img-top" src="'+image +'" alt="Card image cap">\
+            <div class="card-body">\
+            <a href="'+ link +'" class="card-title">"'+ title +'"</a>\
+            <p class="card-text">'+ director +'</p>\
+            <p class="card-text-comment">'+actor+'</p>\
+            </div>\
+            </div>';
+
+            $('#article-box').append(temp_html);
+
+          }
+          
+        }
+      }
+
+    })  
+}
+
+function slide(){
+
+  $.ajax({
+    type: "POST",
+    url: "/slide/search",
+    data: {},
+    success: function(response){
+      console.log(response)
+
+      if(response['result'] == 'suc'){
+        slider();
+        return;
+      }
+    }
+  })
+}
+
+function slider(){
+
+  $.ajax({
+    type: "GET",
+    url: "/slide/show",
+    data: {},
+    success: function(response){
+
+      let movieList = response['slides']
+
+      for(let i=0; i < movieList.length; i++){
+
+        let img = movieList[i]['img']
+
+        let temp_html = '<div class="card" style="width: 15rem;">\
+        <img class="card-img-top" src="'+img +'" alt="Card image cap">\
+        </div>';
+
+        $('#image-box').append(temp_html);
+      }
+    }
+  })  
+}
+</script>
+
+</head>
+
+
+<body>
+  <div class = "entire">
+
+    <div class ="wrap">
+      <div class="jumbotron">
+        <h1 class="display-3" style="color:#ffffff">MOVIEFLIX</h1>
+<!--         <p class="lead" style="color:#ffffff">영화 뭐 볼지 찾고 계신가요?
+          아무 키워드나 검색해보세요!
+          영화 제목이나 장르, 배우이름도 좋습니다.
+        </p> -->
+      </div>
+
+      <div class="input-group" id = "input-movie">
+        <input id = "input-keyword" type="text" class="form-control" aria-label="Recipient's username" aria-describedby="basic-addon2">
+        <div class="input-group-append">
+          <button onclick="search()" id="btn" class="btn btn-outline-secondary" type="button">검색</button>
+        </div>
+      </div>
+      
+      <img class = 'bg' src='https://cdn.pixabay.com/photo/2014/04/03/10/33/popcorn-310862_1280.png' width="300" height="400">
+    </div>
+
+
+
+    <div class = "wrap2">
+      <div class="card-columns" id="article-box">
+      </div>
+    </div>
+    
+
+    <div class = "wrap3">
+      <p class="lead" style="margin:0">
+        <a onclick="openclose()" class="btn btn-primary btn-lg" href="#" role="button" id="btn-postingbox">개봉 예정영화 보기</a>
+      </p>
+
+      <div class = moviebox id = "movie-box" style="display:none">
+        <div class="jumbotron">
+          <h1 class="display-3" style="color:#ffffff">개봉  예정영화 입니다.</h1>
+          <p class="lead">영화 뭐 볼지 찾고 계신가요?
+            아무 키워드나 검색해보세요!
+            영화 제목이나 장르, 배우이름도 좋습니다.
+          </p>
+        </div>
+
+        <div class = "row" id = "image-box">
+        </div>
+
+      </div>
+    </div>  
+  </div>
+  </body>
+  </html>
+
+
