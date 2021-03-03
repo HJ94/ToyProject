@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.shopping.dao.QnaMapper">
+
+<select id="qnalist" parameterType="Qna" resultType="Qna">
+
+	SELECT qseq, subject, content, id, reply, indate FROM QNA
+	ORDER BY qseq ASC
+
+</select>
+
+<insert id="qnawrite" parameterType="Qna">
+
+	INSERT INTO QNA(QSEQ, SUBJECT, CONTENT, ID, INDATE, REPLY, REP)
+	VALUES(qseq_seq.nextval, #{subject}, #{content}, #{id}, SYSDATE, #{reply, jdbcType=VARCHAR}, #{rep, jdbcType=INTEGER})
+
+</insert>
+
+<select id="qnadetail" parameterType="String" resultType="Qna">
+
+	SELECT QSEQ, SUBJECT, CONTENT,ID, REPLY ,INDATE FROM QNA
+	WHERE QSEQ=#{qseq}
+
+</select>
+
+
+
+</mapper>

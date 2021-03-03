@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+	PUBLIC "-//mybatis.org//DTD config 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-config.dtd">
+	
+<configuration>
+	<typeAliases>
+		<typeAlias type="com.spring.shopping.dto.Member" alias="Member"/>
+		<typeAlias type="com.spring.shopping.dto.Product" alias="Product"/>
+		<typeAlias type="com.spring.shopping.dto.Board" alias = "Board"/>
+		<typeAlias type="com.spring.shopping.dto.Qna" alias="Qna"/>
+		<typeAlias type="com.spring.shopping.dto.Cart" alias="Cart"/>
+		<typeAlias type="com.spring.shopping.dto.Admin" alias="Admin"/>
+		<typeAlias type="com.spring.shopping.util.PagingVO" alias="PagingVO"/>
+	</typeAliases>
+	<mappers>
+		<mapper resource="Mapper/MemberMapper.xml"/>
+		<mapper resource="Mapper/ShopMapper.xml"/>
+		<mapper resource="Mapper/BoardMapper.xml"/>
+		<mapper resource="Mapper/QnaMapper.xml"/>
+		<mapper resource="Mapper/AdminMapper.xml"/>
+	</mappers>
+
+</configuration>
+
+
+	
+
+ 

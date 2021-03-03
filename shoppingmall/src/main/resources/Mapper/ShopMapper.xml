@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.shopping.dao.ShopMapper">
+<select id="mainproduct" parameterType="Product" resultType="Product">
+	
+	SELECT 
+		PSEQ
+		,IMAGE
+		,NAME
+		,CONTENT
+		,PRICE 
+	FROM 
+		PRODUCT
+	ORDER BY
+		KIND ASC
+</select>
+
+<select id="newproduct" parameterType="Product" resultType="Product">
+	
+	SELECT PSEQ, IMAGE, NAME, CONTENT, PRICE FROM PRODUCT
+	WHERE KIND = 'new'
+
+</select>
+
+<select id= "bestproduct" parameterType="Product" resultType="Product">
+
+	SELECT PSEQ, IMAGE, NAME, CONTENT, PRICE FROM PRODUCT
+	WHERE KIND = 'best'
+	
+</select>
+
+<select id = "saleproduct" parameterType="Product" resultType="Product">
+
+	SELECT PSEQ, IMAGE, NAME, CONTENT, PRICE FROM PRODUCT
+	WHERE KIND = 'sale'
+
+</select>
+
+<!-- 카트에 담기 -->
+<insert id="addcart" parameterType="Cart">
+
+	INSERT INTO CART
+	(CSEQ, ID, PRICE, NAME, INDATE, IMAGE)
+	VALUES
+	(cseq_seq.nextval, #{id}, #{price}, #{name}, sysdate, #{image})
+	
+</insert>
+
+<!-- 카트 출력 -->
+<select id="showcart" parameterType="String" resultType="Cart">
+
+	SELECT * FROM CART
+	WHERE ID=#{id, jdbcType=VARCHAR}
+
+</select>
+
+<!-- 상품 상세보기 -->
+<select id="product_detail" parameterType="String" resultType="Product">
+
+	SELECT
+		NAME
+		,PRICE
+		,IMAGE
+		,CONTENT
+	FROM
+		PRODUCT
+	WHERE 
+		PSEQ=#{pseq, jdbcType=VARCHAR}
+</select>
+
+<!-- 카트 삭제 -->
+<delete id="cartdelete" parameterType="String">
+
+	DELETE FROM 
+		CART
+	WHERE 
+		CSEQ=#{cseq}
+
+</delete>
+
+
+</mapper>

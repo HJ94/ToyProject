@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 회원 정보 처리  -->
+<mapper namespace="com.spring.shopping.dao.MemberMapper">
+
+<!-- 회원가입 -->
+<insert id="insertMember" parameterType="Member">
+	
+	INSERT INTO MEMBER
+	(MSEQ, NAME, ID, PW, EMAIL, PHONE, ADDRESS)
+	VALUES
+	(mseq_seq.nextval ,#{name}, #{id}, #{pw}, #{email}, #{phone}, #{address})
+
+</insert>
+<!-- 아이디 중복 체크 -->
+<select id="idcheck" parameterType="String" resultType="String">
+
+	SELECT
+		ID
+	FROM
+		MEMBER
+	WHERE 
+		ID=#{id}
+
+</select>
+
+
+<!-- 로그인 -->	
+<select id="loginMember" parameterType="Member" resultType="Member">
+	
+		SELECT 
+			NAME
+			,ID
+			,PW
+			,EMAIL
+			,PHONE
+			,ADDRESS
+		FROM
+			MEMBER
+		WHERE
+			ID=#{id} AND
+			PW=#{pw}
+	
+	</select>
+	
+<!-- Mypage 내 정보 보기 -->	
+<select id ="memberinfo" parameterType="String" resultType="Member">
+	
+	SELECT
+		NAME
+		,ID
+		,PW
+		,EMAIL
+		,PHONE
+		,ADDRESS
+	FROM
+		MEMBER
+	WHERE
+		ID=#{id, jdbcType=VARCHAR}
+</select>
+
+<!-- Mypage 내 정보 수정 -->
+<update id="memberinfoupdate" parameterType="Member">
+
+	UPDATE 
+		MEMBER
+	SET
+		PW=#{pw}
+		,EMAIL=#{email}
+		,ADDRESS=#{address}
+	WHERE
+		ID=#{id}		
+</update> 
+
+
+<!-- Mypage 회원 탈퇴 -->
+<delete id="memberinfodelete" parameterType="String">
+
+	DELETE FROM MEMBER
+	WHERE ID=#{id}
+
+</delete>	
+</mapper>

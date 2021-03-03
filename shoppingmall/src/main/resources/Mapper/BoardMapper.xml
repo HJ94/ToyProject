@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace ="com.spring.shopping.dao.BoardMapper">
+
+<select id="usedmarket" parameterType="Board" resultType="Board">
+	
+	SELECT BSEQ, SUBJECT, CONTENT, ID, INDATE, HIT FROM BOARD
+	ORDER BY BSEQ ASC
+	
+</select>
+
+<update id="upHit" parameterType="String">
+	
+	UPDATE 
+		BOARD 
+	SET 
+		HIT = HIT+1
+	WHERE 
+		BSEQ = #{bseq}
+
+</update>
+
+<insert id ="marketwrite" parameterType="Board">
+
+	INSERT INTO BOARD(BSEQ, ID, SUBJECT, CONTENT, INDATE, HIT) VALUES(BSEQ_SEQ.NEXTVAL, #{id}, #{subject}, #{content}, SYSDATE, 1)
+
+</insert>
+
+<select id="usedmarket_detail" parameterType="String" resultType="Board">
+
+	SELECT BSEQ, SUBJECT, CONTENT, ID, INDATE FROM BOARD
+	WHERE BSEQ=#{bseq}
+		
+</select>
+
+<delete id="usedmarketdelete" parameterType="String">
+
+	DELETE FROM BOARD
+	WHERE BSEQ=#{bseq}
+	
+</delete>
+
+<update id="usedmarketupdate" parameterType="Board">
+
+	UPDATE BOARD SET SUBJECT=#{subject}, CONTENT=#{content} WHERE BSEQ=#{bseq} 
+
+</update>
+
+<!-- 총 게시글 갯수 출력 -->
+<select id="countBoard" resultType="int">
+
+	SELECT COUNT (*) FROM BOARD
+
+</select>
+
+<!-- 페이징 처리 후 게시글 조회 -->
+<select id="selectBoard" resultType="Board">
+
+	SELECT *
+	FROM 
+		(SELECT ROWNUM RN, A.*
+			FROM(
+				SELECT * 
+				FROM BOARD
+				ORDER BY BSEQ DESC
+				) A
+		)
+	WHERE RN BETWEEN #{start} AND #{end}	
+</select>
+
+</mapper>
